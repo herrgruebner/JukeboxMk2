@@ -66,7 +66,7 @@ namespace JukeboxMk2.Models
             });
         }
 
-        public void AddSong(string id)
+        public void AddSong(string id, bool secondAttempt = false)
         {
             var data = new Db().GetData().FirstOrDefault(s => s.Name == "max");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", data.AccessToken);
@@ -79,10 +79,13 @@ namespace JukeboxMk2.Models
             else
             {
                 RefreshTokenForUser("max");
-                throw new Exception("Token expired, please try again");
+                if (secondAttempt)
+                    throw new Exception("Token expired, please try again");
+                AddSong(id, true);
+
             }
         }
-        public IEnumerable<Song> SearchSongs(string name)
+        public IEnumerable<Song> SearchSongs(string name, bool secondAttempt = false)
         {
             var data = new Db().GetData().FirstOrDefault(s => s.Name == "max");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", data.AccessToken);
@@ -107,7 +110,9 @@ namespace JukeboxMk2.Models
             else
             {
                 RefreshTokenForUser("max");
-                throw new Exception("Token expired, please try again");
+                if (secondAttempt)
+                    throw new Exception("Token expired, please try again");
+                SearchSongs(name, true);
             }
             return null;
         }
