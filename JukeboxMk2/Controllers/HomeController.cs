@@ -58,11 +58,11 @@ namespace JukeboxMk2.Controllers
             var tracks = spotify.SearchSongs(name);
             return View(tracks);
         }
-        public IActionResult AddSong(string id)
+        public IActionResult AddSong(string id, string title)
         {
             var spotify = new Spotify();
             spotify.AddSong(id);
-            ViewBag.Message = $"Success, {id} added";
+            ViewBag.Message = $"Success, {title} added";
             return View("Index");
         }
         public IActionResult AccountList()
