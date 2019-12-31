@@ -102,6 +102,7 @@ namespace JukeboxMk2.Models
                         Title = item.name,
                         Artist = string.Join(" ", item.artists.Select(s => s.name)),
                         Id = item.id,
+                        Length = item.duration_ms / 1000
                     };
                     songs.Add(song);
                 }
@@ -130,6 +131,7 @@ namespace JukeboxMk2.Models
         public string Title { get; set; }
         public string Artist { get; set; }
         public string Id { get; set; }
+        public int Length { get; set; }
     }
     public class Tokens
     {

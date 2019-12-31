@@ -19,9 +19,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.Artist)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Id)
-            </th>
+            <th>@Html.DisplayNameFor(model => model.Length) (s)</th>
             <th></th>
         </tr>
     </thead>
@@ -31,12 +29,13 @@
             <tr>
                 <td>
                     @Html.DisplayFor(modelItem => item.Title)
+                    @Html.HiddenFor(modelItem => item.Id)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Artist)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Id)
+                    @Html.DisplayFor(modelItem => item.Length)
                 </td>
                 <td>
                     @Html.ActionLink("Add", "AddSong", new { id = item.Id, title = item.Title })
