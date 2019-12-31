@@ -14,7 +14,7 @@
         
         @if (ViewBag.Message != null && ViewBag.Message != string.Empty)
         {
-            <div>@ViewBag.Message</div>
+            <div class="btn btn-success ">@ViewBag.Message</div>
         }
         <form asp-controller="home" asp-action="Search">
             <input type="text" name="name" placeholder="Song name" />

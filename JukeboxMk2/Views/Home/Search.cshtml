@@ -1,10 +1,10 @@
 ﻿@model IEnumerable<JukeboxMk2.Models.Song>
 
 @{
-    ViewData["Title"] = "View";
+    ViewData["Title"] = "Song Search";
 }
 
-<h1>View</h1>
+<h1>Song Search</h1>
 
 <form asp-controller="home" asp-action="Search">
     <input type="text" name="name" placeholder="Song name" />
@@ -26,21 +26,48 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Title)
-                    @Html.HiddenFor(modelItem => item.Id)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Artist)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Length)
-                </td>
-                <td>
-                    @Html.ActionLink("Add", "AddSong", new { id = item.Id, title = item.Title })
-                </td>
-            </tr>
+            @if (item.Length > 310)
+            {
+                <text>
+                    <tr class="table-danger">
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Title)
+                            @Html.HiddenFor(modelItem => item.Id)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Artist)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Length)
+                        </td>
+                        <td>
+                            <div class="disabled">
+                                <div>Too long</div>
+                            </div>
+                        </td>
+                    </tr>
+                </text>
+            }
+            else
+            {
+                <text>
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Title)
+                            @Html.HiddenFor(modelItem => item.Id)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Artist)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Length)
+                        </td>
+                        <td>
+                            @Html.ActionLink("Add", "AddSong", new { id = item.Id, title = item.Title })
+                        </td>
+                    </tr>
+                </text>
+            }
         }
     </tbody>
 </table>
