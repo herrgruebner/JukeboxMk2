@@ -62,7 +62,7 @@ namespace JukeboxMk2.Controllers
         {
             var spotify = new Spotify();
             spotify.AddSong(id);
-            ViewBag.Message = $"Success, {title} added";
+            ViewBag.Message = $"Success, '{title}' added";
             return View("Index");
         }
         public IActionResult AccountList()
