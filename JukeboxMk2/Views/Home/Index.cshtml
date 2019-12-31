@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+    <div class="text-center">
+        <h1 class="display-4">Welcome</h1>
+        <div class="hidden">
+            <form asp-controller="home" asp-action="GetAuthorisationCode">
+                <input type="text" name="name" />
+                <button class="btn btn-primary" value="hello" text="submit" formaction="home/GetAuthorisationCode">Submit</button>
+            </form>
+        </div>
+        @if (ViewBag.Message != null && ViewBag.Message != string.Empty)
+        {
+            <div>@ViewBag.Message</div>
+        }
+        <form asp-controller="home" asp-action="Search">
+            <input type="text" name="name" placeholder="Song name"/>
+            <button class="btn btn-primary" value="hello" text="submit" >Search</button>
+        </form>
+    </div>
+
+

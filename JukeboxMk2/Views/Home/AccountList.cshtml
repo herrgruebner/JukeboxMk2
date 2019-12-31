@@ -1,0 +1,30 @@
+﻿@model IEnumerable<JukeboxMk2.Models.UserData>
+
+@{
+    ViewData["Title"] = "View";
+}
+
+<h1>View</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.ActionLink("Add songs", "AddSongs", new { item.Name }) 
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
