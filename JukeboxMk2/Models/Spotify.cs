@@ -70,7 +70,7 @@ namespace JukeboxMk2.Models
         {
             var data = new Db().GetData().FirstOrDefault(s => s.Name == "max");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", data.AccessToken);
-            var playlistId = "2OmJbkmk1tuQggcFW97VFr";
+            var playlistId = "3Dn6zN5v4fF4qTfM7DSnPB";
             var response = client.PostAsync($"https://api.spotify.com/v1/playlists/{playlistId}/tracks?uris=spotify%3Atrack%3A{id}", null).Result;
             if (response.IsSuccessStatusCode)
             {

@@ -56,6 +56,11 @@ namespace JukeboxMk2.Controllers
         {
             var spotify = new Spotify();
             var tracks = spotify.SearchSongs(name);
+            if (tracks == null)
+            {
+                ViewBag.ErrorMessage = "tracks is null";
+                return View("Error");
+            }
             return View(tracks);
         }
         public IActionResult AddSong(string id, string title)
