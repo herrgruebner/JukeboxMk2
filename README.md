@@ -7,3 +7,7 @@ Spotify has a collaborative mode, but it requires copying a link and sharing it 
 Also I made a version of this based off Youtube before Spotify made theirs, so they can get off my lawn 👴
 
 I've replaced the youtube version with this version based on spotify (hence the mk2) because spotify doesn't have ads and junk. I originally put it together in 4 hours for a NYE party, so it's a touch rough, but I've since added the ability for anyone to create playlists.
+
+An example is continously deployed at https://jukeboxmk2.azurewebsites.net
+
+You might need to give it a second to spin up, azure will spin it down if it's not being used.
