@@ -1,11 +1,11 @@
-﻿@model IEnumerable<JukeboxMk2.Models.Song>
+﻿@model SearchModel
 
 @{
     ViewData["Title"] = "Song Search";
 }
 
 <h1>Song Search</h1>
-
+<h2>Playlist id: @Model.PlaylistId</h2>
 <form asp-controller="home" asp-action="Search">
     <input type="text" name="name" placeholder="Song name" />
     <button class="btn btn-primary" value="hello" text="submit">Search</button>
@@ -14,17 +14,17 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Title)
+                @Html.DisplayNameFor(model => model.Songs.FirstOrDefault().Title)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Artist)
+                @Html.DisplayNameFor(model => model.Songs.FirstOrDefault().Artist)
             </th>
-            <th>@Html.DisplayNameFor(model => model.Length) (s)</th>
+            <th>@Html.DisplayNameFor(model => model.Songs.FirstOrDefault().Length) (s)</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.Songs)
         {
             @if (item.Length > 310)
             {
@@ -63,7 +63,7 @@
                             @Html.DisplayFor(modelItem => item.Length)
                         </td>
                         <td>
-                            @Html.ActionLink("Add", "AddSong", new { id = item.Id, title = item.Title })
+                            @Html.ActionLink("Add", "AddSong", new { id = item.Id, title = item.Title, playlistId = Model.PlaylistId })
                         </td>
                     </tr>
                 </text>

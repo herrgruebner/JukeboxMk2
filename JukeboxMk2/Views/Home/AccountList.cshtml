@@ -10,7 +10,7 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.DisplayNameFor(model => model.JukeBoxId)
             </th>
             <th></th>
         </tr>
@@ -19,10 +19,10 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Name)
+                @Html.DisplayFor(modelItem => item.JukeBoxId)
             </td>
             <td>
-                @Html.ActionLink("Add songs", "AddSongs", new { item.Name }) 
+                @Html.ActionLink("Add songs", "AddSongs", new { item.JukeBoxId }) 
             </td>
         </tr>
 }

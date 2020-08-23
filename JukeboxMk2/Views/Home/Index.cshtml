@@ -5,12 +5,11 @@
     <div class="text-center">
         <h1 class="display-4">Welcome</h1>
         <h2 class="display-4">Add songs to the playlist</h2>
-        <!--<div class="hidden">
-        <form asp-controller="home" asp-action="GetAuthorisationCode">
-            <input type="text" name="name" />
-            <button class="btn btn-primary" value="hello" text="submit" formaction="home/GetAuthorisationCode">Submit</button>
-        </form>
-        </div>-->
+        <div>
+            <form asp-controller="home" asp-action="GetAuthorisationCode">
+                <button class="btn btn-primary" value="hello" text="submit" formaction="home/GetAuthorisationCode">Authorise Jukebox to access your spotify</button>
+            </form>
+        </div>
         
         @if (ViewBag.Message != null && ViewBag.Message != string.Empty)
         {

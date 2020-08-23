@@ -27,8 +27,9 @@ namespace JukeboxMk2.Controllers
         {
             return View();
         }
-        public IActionResult GetAuthorisationCode(string name)
+        public IActionResult GetAuthorisationCode()
         {
+            var name = new Guid();
             var scopes = "playlist-read-collaborative%20playlist-modify-public";
             var clientid = Environment.GetEnvironmentVariable("ClientId");
             return Redirect($"https://accounts.spotify.com/authorize?client_id={clientid}&response_type=code&redirect_uri={GenerateRedirectUri()}&scope={scopes}&state={name}");
@@ -46,12 +47,15 @@ namespace JukeboxMk2.Controllers
             {
                 AccessToken = tokens.access_token,
                 RefreshToken = tokens.refresh_token,
-                Name = state
+                JukeBoxId = state,
             };
+            spotify.CreateNewPlaylist(data); // sets the playlist id in userdata
+
             var db = new Db();
             db.InsertData(data);
             return View("Index");
         }
+
         public IActionResult Search(string name)
         {
             var spotify = new Spotify();
@@ -63,10 +67,11 @@ namespace JukeboxMk2.Controllers
             }
             return View(tracks);
         }
-        public IActionResult AddSong(string id, string title)
+        public IActionResult AddSong(string id, string title, string playlistId)
         {
+            var data = new Db().GetData().FirstOrDefault(s => s.JukeBoxId == playlistId);
             var spotify = new Spotify();
-            spotify.AddSong(id);
+            spotify.AddSong(id, data);
             ViewBag.Message = $"Success, '{title}' added";
             return View("Index");
         }

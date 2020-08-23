@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace JukeboxMk2.Models
 {
-    public class UserData
+    public class SearchModel
     {
-        public string JukeBoxId { get; set; }
-        public string AccessToken { get; set; }
-        public string RefreshToken { get; set; }
+        public IEnumerable<Song> Songs { get; set; }
+        [DisplayName("Song Name")]
+        public string SongName { get; set; }
         public string PlaylistId { get; set; }
+
     }
 }
