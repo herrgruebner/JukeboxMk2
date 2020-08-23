@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 
 namespace JukeboxMk2.Models
 {
@@ -18,7 +19,7 @@ namespace JukeboxMk2.Models
             {
                 { "grant_type", "authorization_code" }, //oauth spec
                 { "code", authorisationCode},
-                { "redirect_uri", redirectUri} // not actual used, but for validation
+                { "redirect_uri", redirectUri} // not actually used, but for validation
             };
 
             var content = new FormUrlEncodedContent(values);
@@ -53,48 +54,63 @@ namespace JukeboxMk2.Models
             return auth;
         }
 
-        public void RefreshTokenForUser(string name)
+        public string CreateNewPlaylist(UserData data, bool secondAttempt = false)
+        {
+            var profile = GetUserProfile(data);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", data.AccessToken);
+            var content = new StringContent(JsonConvert.SerializeObject(new PlaylistRequestModel()), Encoding.UTF8, "application/json");
+            var response = client.PostAsync($"https://api.spotify.com/v1/users/{profile.id}/playlists", null).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                var newPlaylistJson = response.Content.ReadAsStringAsync().Result;
+                var playlist = JsonConvert.DeserializeObject<Playlist>(newPlaylistJson);
+                return playlist.id;
+            }
+            else
+            {
+                RefreshTokenForJukebox(data.JukeBoxId);
+                if (secondAttempt)
+                    throw new Exception("Token expired, please try again");
+                return CreateNewPlaylist(data, true);
+            }
+        }
+
+        public void RefreshTokenForJukebox(string name)
         {
             var db = new Db();
-            var data = db.GetData().FirstOrDefault(s => s.Name == name);
+            var data = db.GetData().FirstOrDefault(s => s.JukeBoxId == name);
             var tokens = RefreshTokens(data.RefreshToken);
             db.UpdateTokens(new UserData()
             {
                 AccessToken = tokens.access_token,
-                Name = name,
+                JukeBoxId = name,
                 RefreshToken = tokens.refresh_token
             });
         }
 
-        public void AddSong(string id, bool secondAttempt = false)
+        public void AddSong(string id, UserData data, bool secondAttempt = false)
         {
-            var data = new Db().GetData().FirstOrDefault(s => s.Name == "max");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", data.AccessToken);
-            var playlistId = "3Dn6zN5v4fF4qTfM7DSnPB";
-            var response = client.PostAsync($"https://api.spotify.com/v1/playlists/{playlistId}/tracks?uris=spotify%3Atrack%3A{id}", null).Result;
-            if (response.IsSuccessStatusCode)
-            {
-
-            }
-            else
-            {
-                RefreshTokenForUser("max");
+            var response = client.PostAsync($"https://api.spotify.com/v1/playlists/{data.PlaylistId}/tracks?uris=spotify%3Atrack%3A{id}", null).Result;
+            if (!response.IsSuccessStatusCode)
+            {                 
+                RefreshTokenForJukebox("max");
                 if (secondAttempt)
                     throw new Exception("Token expired, please try again");
-                AddSong(id, true);
+                AddSong(id, data, true);
 
             }
         }
         public IEnumerable<Song> SearchSongs(string name, bool secondAttempt = false)
         {
-            var data = new Db().GetData().FirstOrDefault(s => s.Name == "max");
+            var data = new Db().GetData().FirstOrDefault(s => s.JukeBoxId == "max");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", data.AccessToken);
             var response = client.GetAsync($"https://api.spotify.com/v1/search?q={WebUtility.UrlEncode(name)}&type=track").Result;
             var songs = new List<Song>();
             if (response.IsSuccessStatusCode)
             {
                 var trackjson = response.Content.ReadAsStringAsync().Result;
-                var tracks = JsonConvert.DeserializeObject<RootObject>(trackjson);
+                var tracks = JsonConvert.DeserializeObject<TrackList>(trackjson);
                 foreach (var item in tracks.tracks.items)
                 {
                     var song = new Song()
@@ -110,10 +126,31 @@ namespace JukeboxMk2.Models
             }
             else
             {
-                RefreshTokenForUser("max");
+                RefreshTokenForJukebox("max");
                 if (secondAttempt)
                     throw new Exception("Token expired, please try again");
                 SearchSongs(name, true);
+            }
+            return null;
+        }
+
+        public Profile GetUserProfile(UserData data, bool secondAttempt = false)
+        {
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", data.AccessToken);
+            var response = client.GetAsync($"https://api.spotify.com/v1/me").Result;
+            if (response.IsSuccessStatusCode)
+            {
+                var profileJson = response.Content.ReadAsStringAsync().Result;
+                var profile = JsonConvert.DeserializeObject<Profile>(profileJson);
+                return profile;
+
+            }
+            else
+            {
+                RefreshTokenForJukebox(data.JukeBoxId);
+                if (secondAttempt)
+                    throw new Exception("Token expired, please try again");
+                GetUserProfile(data, true);
             }
             return null;
         }
@@ -126,7 +163,65 @@ namespace JukeboxMk2.Models
 
     }
 
-    public class Song
+    public class PlaylistRequestModel
+    {
+        public string Name => $"Jukebox {DateTime.Now.ToString("yyyy-MM-dd")}";
+    }
+    public class ExternalUrls
+    {
+        public string spotify { get; set; }
+    }
+
+    public class Followers
+    {
+        public object href { get; set; }
+        public int total { get; set; }
+    }
+
+    public class ExternalUrls2
+    {
+        public string spotify { get; set; }
+    }
+
+    public class Owner
+    {
+        public ExternalUrls2 external_urls { get; set; }
+        public string href { get; set; }
+        public string id { get; set; }
+        public string type { get; set; }
+        public string uri { get; set; }
+    }
+
+    public class Tracks
+    {
+        public string href { get; set; }
+        public List<Item> items { get; set; }
+        public int limit { get; set; }
+        public object next { get; set; }
+        public int offset { get; set; }
+        public object previous { get; set; }
+        public int total { get; set; }
+    }
+
+    public class Playlist
+    {
+        public bool collaborative { get; set; }
+        public object description { get; set; }
+        public ExternalUrls external_urls { get; set; }
+        public Followers followers { get; set; }
+        public string href { get; set; }
+        public string id { get; set; }
+        public List<object> images { get; set; }
+        public string name { get; set; }
+        public Owner owner { get; set; }
+        public bool Public { get; set; }
+        public string snapshot_id { get; set; }
+        public Tracks tracks { get; set; }
+        public string type { get; set; }
+        public string uri { get; set; }
+    }
+
+public class Song
     {
         public string Title { get; set; }
         public string Artist { get; set; }
@@ -148,11 +243,6 @@ namespace JukeboxMk2.Models
         public string refresh_token { get; set; }
     }
 
-    public class ExternalUrls
-    {
-        public string spotify { get; set; }
-    }
-
     public class Artist
     {
         public ExternalUrls external_urls { get; set; }
@@ -161,11 +251,6 @@ namespace JukeboxMk2.Models
         public string name { get; set; }
         public string type { get; set; }
         public string uri { get; set; }
-    }
-
-    public class ExternalUrls2
-    {
-        public string spotify { get; set; }
     }
 
     public class Image
@@ -192,41 +277,21 @@ namespace JukeboxMk2.Models
         public string uri { get; set; }
     }
 
-    public class ExternalUrls3
-    {
-        public string spotify { get; set; }
-    }
-
-    public class Artist2
-    {
-        public ExternalUrls3 external_urls { get; set; }
-        public string href { get; set; }
-        public string id { get; set; }
-        public string name { get; set; }
-        public string type { get; set; }
-        public string uri { get; set; }
-    }
-
     public class ExternalIds
     {
         public string isrc { get; set; }
     }
 
-    public class ExternalUrls4
-    {
-        public string spotify { get; set; }
-    }
-
     public class Item
     {
         public Album album { get; set; }
-        public List<Artist2> artists { get; set; }
+        public List<Artist> artists { get; set; }
         public List<string> available_markets { get; set; }
         public int disc_number { get; set; }
         public int duration_ms { get; set; }
         public bool @explicit { get; set; }
         public ExternalIds external_ids { get; set; }
-        public ExternalUrls4 external_urls { get; set; }
+        public ExternalUrls external_urls { get; set; }
         public string href { get; set; }
         public string id { get; set; }
         public bool is_local { get; set; }
@@ -238,19 +303,25 @@ namespace JukeboxMk2.Models
         public string uri { get; set; }
     }
 
-    public class Tracks
-    {
-        public string href { get; set; }
-        public List<Item> items { get; set; }
-        public int limit { get; set; }
-        public string next { get; set; }
-        public int offset { get; set; }
-        public object previous { get; set; }
-        public int total { get; set; }
-    }
 
-    public class RootObject
+
+    public class TrackList
     {
         public Tracks tracks { get; set; }
+    }
+
+    public class Profile
+    {
+        public string country { get; set; }
+        public string display_name { get; set; }
+        public string email { get; set; }
+        public ExternalUrls external_urls { get; set; }
+        public Followers followers { get; set; }
+        public string href { get; set; }
+        public string id { get; set; }
+        public List<Image> images { get; set; }
+        public string product { get; set; }
+        public string type { get; set; }
+        public string uri { get; set; }
     }
 }

@@ -16,7 +16,6 @@ namespace JukeboxMk2.Models
         }
         public void CreateDatabase()
         {
-            
             using var connection = new SqlConnection(Environment.GetEnvironmentVariable("ConnectionString"));
             connection.Execute(@"IF NOT EXISTS 
                     (SELECT 'X'
@@ -24,12 +23,12 @@ namespace JukeboxMk2.Models
                     WHERE  TABLE_NAME = 'user_data')
                 BEGIN
                     create table user_data (
-                        Name varchar(max),
+                        JukeboxId varchar(max),
                         AccessToken varchar(max),
-                        RefreshToken varchar(max)
+                        RefreshToken varchar(max),
+                        PlaylistId varchar(max)
                     )
                 END");
-
         }
         public IEnumerable<UserData> GetData()
         {
@@ -40,15 +39,15 @@ namespace JukeboxMk2.Models
         public void InsertData(UserData data)
         {
             using var connection = new SqlConnection(Environment.GetEnvironmentVariable("ConnectionString"));
-            var res = connection.Execute("insert into user_data (Name, AccessToken, RefreshToken ) VALUES (@name, @accessToken, @refreshToken);", 
-                new { name = data.Name, accessToken = data.AccessToken, refreshToken = data.RefreshToken });
+            var res = connection.Execute("insert into user_data (JukeboxId, AccessToken, RefreshToken, PlaylistId ) VALUES (@jukeboxId, @accessToken, @refreshToken, @playlistId);", 
+                new { jukeboxId = data.JukeBoxId, accessToken = data.AccessToken, refreshToken = data.RefreshToken, playlistId = data.PlaylistId });
             
         }
         public void UpdateTokens(UserData data)
         {
             using var connection = new SqlConnection(Environment.GetEnvironmentVariable("ConnectionString"));
-            var res = connection.Execute("update user_data set AccessToken = @accessToken where name = @name",
-                new { name = data.Name, accessToken = data.AccessToken, refreshToken = data.RefreshToken });
+            var res = connection.Execute("update user_data set AccessToken = @accessToken where JukeboxId = @jukeboxId",
+                new { jukeboxId = data.JukeBoxId, accessToken = data.AccessToken, refreshToken = data.RefreshToken });
         }
     }
 }
