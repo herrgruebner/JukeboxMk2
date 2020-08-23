@@ -68,7 +68,6 @@ namespace JukeboxMk2.Controllers
             return View(new SearchModel() { Songs = tracks, PlaylistId = playlistId});
         }
 
-
         public IActionResult AddSong(string id, string title, string playlistId)
         {
             var data = new Db().GetData().FirstOrDefault(s => s.JukeBoxId == playlistId);

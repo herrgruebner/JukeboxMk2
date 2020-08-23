@@ -2,25 +2,30 @@
     ViewData["Title"] = "Home Page";
 }
 
-    <div class="text-center">
-        <h1 class="display-4">Welcome</h1>
-        <h2 class="display-4">Add songs to the playlist</h2>
-        <div>
-            <form asp-controller="home" asp-action="GetAuthorisationCode">
-                <button class="btn btn-primary" value="hello" text="submit" formaction="home/GetAuthorisationCode">Authorise Jukebox to access your spotify</button>
-            </form>
-        </div>
-        
-        @if (ViewBag.Message != null && ViewBag.Message != string.Empty)
-        {
-            <div class="btn btn-success ">@ViewBag.Message</div>
-        }
-    <form asp-controller="home" asp-action="Search">
-        <input type="text" name="name" placeholder="Song name" />
-        <input type="text" name="playlistId" placeholder="Playlist Id" />
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <h2 class="display-4">Add songs to a playlist</h2>
 
-        <button class="btn btn-primary" value="hello" text="submit">Search</button>
+    @if (ViewBag.Message != null && ViewBag.Message != string.Empty)
+    {
+        <div class="btn btn-success ">@ViewBag.Message</div>
+    }
+    <form asp-controller="home" asp-action="Search">
+        <div class="form-group">
+            <input type="text" name="name" placeholder="Song name" />
+        </div>
+        <div class="form-group">
+            <input type="text" name="playlistId" placeholder="Playlist Id" />
+        </div>
+
+        <button class="btn btn-primary" value="hello" text="submit">Search Songs</button>
     </form>
+    <hr />
+    <div>
+        <form asp-controller="home" asp-action="GetAuthorisationCode">
+            <button class="btn btn-primary" value="hello" text="submit" formaction="home/GetAuthorisationCode">Generate a playlist on your Spotify</button>
+        </form>
     </div>
+</div>
 
 
