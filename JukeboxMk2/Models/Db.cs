@@ -16,7 +16,6 @@ namespace JukeboxMk2.Models
         }
         public void CreateDatabase()
         {
-            
             using var connection = new SqlConnection(Environment.GetEnvironmentVariable("ConnectionString"));
             connection.Execute(@"IF NOT EXISTS 
                     (SELECT 'X'
@@ -30,7 +29,6 @@ namespace JukeboxMk2.Models
                         PlaylistId varchar(max)
                     )
                 END");
-
         }
         public IEnumerable<UserData> GetData()
         {

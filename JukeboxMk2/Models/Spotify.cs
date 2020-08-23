@@ -54,7 +54,7 @@ namespace JukeboxMk2.Models
             return auth;
         }
 
-        public void CreateNewPlaylist(UserData data, bool secondAttempt = false)
+        public string CreateNewPlaylist(UserData data, bool secondAttempt = false)
         {
             var profile = GetUserProfile(data);
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", data.AccessToken);
@@ -64,14 +64,14 @@ namespace JukeboxMk2.Models
             {
                 var newPlaylistJson = response.Content.ReadAsStringAsync().Result;
                 var playlist = JsonConvert.DeserializeObject<Playlist>(newPlaylistJson);
-                data.PlaylistId = playlist.id;
+                return playlist.id;
             }
             else
             {
                 RefreshTokenForJukebox(data.JukeBoxId);
                 if (secondAttempt)
                     throw new Exception("Token expired, please try again");
-                CreateNewPlaylist(data, true);
+                return CreateNewPlaylist(data, true);
             }
         }
 

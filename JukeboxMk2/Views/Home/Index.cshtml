@@ -15,10 +15,12 @@
         {
             <div class="btn btn-success ">@ViewBag.Message</div>
         }
-        <form asp-controller="home" asp-action="Search">
-            <input type="text" name="name" placeholder="Song name" />
-            <button class="btn btn-primary" value="hello" text="submit">Search</button>
-        </form>
+    <form asp-controller="home" asp-action="Search">
+        <input type="text" name="name" placeholder="Song name" />
+        <input type="text" name="playlistId" placeholder="Playlist Id" />
+
+        <button class="btn btn-primary" value="hello" text="submit">Search</button>
+    </form>
     </div>
 
 
