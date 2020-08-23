@@ -6,6 +6,11 @@
 
 <h1>Song Search</h1>
 <h2>Playlist id: @Model.PlaylistId</h2>
+
+@if (ViewBag.Message != null && ViewBag.Message != string.Empty)
+{
+    <div class="btn btn-success ">@ViewBag.Message</div>
+}
 <form asp-controller="home" asp-action="Search">
     <input type="text" name="name" placeholder="Song name" />
     <button class="btn btn-primary" value="hello" text="submit">Search</button>
