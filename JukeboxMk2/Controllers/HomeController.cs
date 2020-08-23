@@ -29,7 +29,8 @@ namespace JukeboxMk2.Controllers
         }
         public IActionResult GetAuthorisationCode()
         {
-            var name = new Guid();
+            //todo user submitted playlist ids or smaller codes. Guids are cool, but not user friendly
+            var name = Guid.NewGuid();
             var scopes = "playlist-read-collaborative%20playlist-modify-public";
             var clientid = Environment.GetEnvironmentVariable("ClientId");
             return Redirect($"https://accounts.spotify.com/authorize?client_id={clientid}&response_type=code&redirect_uri={GenerateRedirectUri()}&scope={scopes}&state={name}");
@@ -49,17 +50,20 @@ namespace JukeboxMk2.Controllers
                 RefreshToken = tokens.refresh_token,
                 JukeBoxId = state,
             };
-            data.PlaylistId = spotify.CreateNewPlaylist(data); // sets the playlist id in userdata
-
             var db = new Db();
             db.InsertData(data);
-            return View("Index");
+
+            data.PlaylistId = spotify.CreateNewPlaylist(data); // sets the playlist id in userdata
+
+            db.UpdatePlaylistId(data);
+            ViewBag.Message = $"Success, playlist created";
+            return View("Search", new SearchModel() { PlaylistId = data.JukeBoxId, Songs = new List<Song>() });
         }
 
         public IActionResult Search(string name, string playlistId)
         {
             var spotify = new Spotify();
-            var tracks = spotify.SearchSongs(name);
+            var tracks = spotify.SearchSongs(name, playlistId);
             if (tracks == null)
             {
                 ViewBag.ErrorMessage = "tracks is null";
@@ -74,7 +78,7 @@ namespace JukeboxMk2.Controllers
             var spotify = new Spotify();
             spotify.AddSong(id, data);
             ViewBag.Message = $"Success, '{title}' added";
-            return View("Search", new SearchModel() { PlaylistId = playlistId});
+            return View("Search", new SearchModel() {Songs = new List<Song>(), PlaylistId = playlistId});
         }
         public IActionResult AccountList()
         {

@@ -4,15 +4,16 @@
     ViewData["Title"] = "Song Search";
 }
 
-<h1>Song Search</h1>
-<h2>Playlist id: @Model.PlaylistId</h2>
+<h2>Song Search - Playlist id: @Model.PlaylistId</h2>
 
 @if (ViewBag.Message != null && ViewBag.Message != string.Empty)
 {
     <div class="btn btn-success ">@ViewBag.Message</div>
 }
-<form asp-controller="home" asp-action="Search">
-    <input type="text" name="name" placeholder="Song name" />
+<hr />
+<form asp-controller="home" asp-action="Search" class="form-inline">
+    @Html.HiddenFor(m => m.PlaylistId)
+    <input type="text" name="name" class="form-control" placeholder="Song name" />
     <button class="btn btn-primary" value="hello" text="submit">Search</button>
 </form>
 <table class="table table-striped table-sm">

@@ -58,8 +58,9 @@ namespace JukeboxMk2.Models
         {
             var profile = GetUserProfile(data);
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", data.AccessToken);
-            var content = new StringContent(JsonConvert.SerializeObject(new PlaylistRequestModel()), Encoding.UTF8, "application/json");
-            var response = client.PostAsync($"https://api.spotify.com/v1/users/{profile.id}/playlists", null).Result;
+            
+            var content = new StringContent($"{{\"name\":\"Jukebox {DateTime.Now.ToString("yyyy-MM-dd")}\"}}", Encoding.UTF8, "application/json"); // todo user submitted name
+            var response = client.PostAsync($"https://api.spotify.com/v1/users/{profile.id}/playlists", content).Result;
             if (response.IsSuccessStatusCode)
             {
                 var newPlaylistJson = response.Content.ReadAsStringAsync().Result;
@@ -101,9 +102,9 @@ namespace JukeboxMk2.Models
 
             }
         }
-        public IEnumerable<Song> SearchSongs(string name, bool secondAttempt = false)
+        public IEnumerable<Song> SearchSongs(string name, string playlistId, bool secondAttempt = false)
         {
-            var data = new Db().GetData().FirstOrDefault(s => s.JukeBoxId == "max");
+            var data = new Db().GetData().FirstOrDefault(s => s.JukeBoxId == playlistId);
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", data.AccessToken);
             var response = client.GetAsync($"https://api.spotify.com/v1/search?q={WebUtility.UrlEncode(name)}&type=track").Result;
             var songs = new List<Song>();
@@ -129,7 +130,7 @@ namespace JukeboxMk2.Models
                 RefreshTokenForJukebox("max");
                 if (secondAttempt)
                     throw new Exception("Token expired, please try again");
-                SearchSongs(name, true);
+                SearchSongs(name, playlistId, true);
             }
             return null;
         }

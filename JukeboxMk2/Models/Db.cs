@@ -16,6 +16,7 @@ namespace JukeboxMk2.Models
         }
         public void CreateDatabase()
         {
+            // todo setup DI and put this in at server startup
             using var connection = new SqlConnection(Environment.GetEnvironmentVariable("ConnectionString"));
             connection.Execute(@"IF NOT EXISTS 
                     (SELECT 'X'
@@ -48,6 +49,13 @@ namespace JukeboxMk2.Models
             using var connection = new SqlConnection(Environment.GetEnvironmentVariable("ConnectionString"));
             var res = connection.Execute("update user_data set AccessToken = @accessToken where JukeboxId = @jukeboxId",
                 new { jukeboxId = data.JukeBoxId, accessToken = data.AccessToken, refreshToken = data.RefreshToken });
+        }
+
+        internal void UpdatePlaylistId(UserData data)
+        {
+            using var connection = new SqlConnection(Environment.GetEnvironmentVariable("ConnectionString"));
+            var res = connection.Execute("update user_data set playlistId = @playlistId where JukeboxId = @jukeboxId",
+                new { jukeboxId = data.JukeBoxId, playlistId = data.PlaylistId });
         }
     }
 }
